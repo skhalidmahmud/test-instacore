@@ -24,6 +24,8 @@ from django import forms
 from .models import User, Notification, AuditLog, ActivityLog
 from .forms import UserRegistrationForm, UserProfileForm
 
+from AdminApp.forms import UserCreationForm
+
 
 def index(request):
     # Check if there are any users in the system
@@ -107,11 +109,27 @@ def register_view(request):
         return redirect('auth:dashboard')
     
     if request.method == 'POST':
-        form = UserRegistrationForm(request.POST)
+        form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.role = 'student'  # Only students can self-register
-            user.set_password(form.cleaned_data['password'])
+            user = form.save()
+            
+            # Set additional fields
+            user.role = 'student'
+            user.email = request.POST.get('email', '')
+            user.first_name = request.POST.get('first_name', '')
+            user.last_name = request.POST.get('last_name', '')
+            user.phone = request.POST.get('phone', '')
+            
+            # Handle date of birth
+            date_of_birth = request.POST.get('date_of_birth')
+            if date_of_birth:
+                from datetime import datetime
+                try:
+                    user.date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+                except ValueError:
+                    pass
+            
+            user.gender = request.POST.get('gender', '')
             user.save()
             
             # Log the action
@@ -124,8 +142,13 @@ def register_view(request):
             
             messages.success(request, f'Account created successfully for {user.username}! You can now log in.')
             return redirect('auth:login')
+        else:
+            # Display form errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
-        form = UserRegistrationForm()
+        form = UserCreationForm()
     
     return render(request, 'AuthApp/register.html', {'form': form})
 

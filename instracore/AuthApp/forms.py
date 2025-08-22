@@ -1,7 +1,7 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import User as CustomUser
+from AuthApp.models import User as CustomUser
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -36,27 +36,22 @@ class UserProfileForm(forms.ModelForm):
         self.fields['username'].widget.attrs['readonly'] = True
 
 
-class UserRegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
-    confirm_password = forms.CharField(widget=forms.PasswordInput)
+class UserRegistrationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
     
     class Meta:
-        model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email', 'phone', 'date_of_birth', 'gender')
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
     
-    def clean(self):
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
-        confirm_password = cleaned_data.get("confirm_password")
-        
-        if password and confirm_password and password != confirm_password:
-            raise forms.ValidationError("Passwords don't match")
-        
-        return cleaned_data
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Remove help text for password fields since we're showing custom requirements
+        self.fields['password1'].help_text = None
+        self.fields['password2'].help_text = None
     
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data["password"])
+        user.email = self.cleaned_data['email']
         if commit:
             user.save()
         return user
