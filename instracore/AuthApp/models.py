@@ -20,7 +20,7 @@ class User(AbstractUser):
         ('other', 'Other'),
     ]
 
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student', null=True)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student', blank=True, null=True)
     sub_role = models.CharField(max_length=30, choices=SUBROLE_CHOICES, blank=True, null=True)
     
     # Profile fields
