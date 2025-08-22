@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}InstaCore Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+        
+        <div class="logo">
+            <i class="fas fa-graduation-cap"></i>
+            <span>InstaCore</span>
+        </div>
+        
+        <div class="nav-center">
+            <a href="{% url 'dashboard' %}">Dashboard</a>
+        </div>
+        
+        <div class="header-actions">
+            <div class="notification-container">
+                <div class="notification-icon">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">{{ unread_notifications_count }}</span>
+                </div>
+                <div class="notification-dropdown">
+                    <div class="notification-dropdown-header">
+                        <h3>Notifications</h3>
+                        <a href="{% url 'notifications' %}">Mark all as read</a>
+                    </div>
+                    {% for notification in recent_notifications %}
+                    <div class="notification-item">
+                        <div class="notification-item-header">
+                            <div class="notification-item-title">{{ notification.message|truncatewords:5 }}</div>
+                            <div class="notification-item-time">{{ notification.created_at|timesince }} ago</div>
+                        </div>
+                        <div class="notification-item-content">{{ notification.message|truncatewords:10 }}</div>
+                    </div>
+                    {% empty %}
+                    <div class="notification-item">
+                        <div class="notification-item-content">No new notifications</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="profile-container">
+                <div class="profile-wrapper">
+                    {% if user.image %}
+                    <img src="{{ user.image.url }}" alt="Profile" class="profile-image">
+                    {% else %}
+                    <img src="https://picsum.photos/seed/{{ user.username }}/40/40.jpg" alt="Profile" class="profile-image">
+                    {% endif %}
+                    <div class="profile-info">
+                        <div class="profile-name">{{ user.get_full_name|default:user.username }}</div>
+                        <div class="profile-role">{{ user.get_role_display }}</div>
+                    </div>
+                </div>
+                <div class="profile-dropdown">
+                    <a href="{% url 'profile' %}"><i class="fas fa-user-circle"></i> My Profile</a>
+                    <a href="{% url 'notifications' %}"><i class="fas fa-bell"></i> Notifications <span class="badge">{{ unread_notifications_count }}</span></a>
+                    <div class="divider"></div>
+                    
+                    <!-- Admin specific links -->
+                    {% if user.role == 'admin' %}
+                    <a href="{% url 'admin:create_admin' %}"><i class="fas fa-user-plus"></i> Create Admin</a>
+                    <a href="{% url 'admin:create_user' %}"><i class="fas fa-users"></i> Create User</a>
+                    <a href="{% url 'admin:panel' %}"><i class="fas fa-tachometer-alt"></i> Admin Panel</a>
+                    {% endif %}
+                    
+                    <!-- HR specific links -->
+                    {% if user.role == 'employee' and user.sub_role == 'hr' %}
+                    <a href="{% url 'hr:job_posts' %}"><i class="fas fa-briefcase"></i> Job Posts</a>
+                    <a href="{% url 'hr:interviews' %}"><i class="fas fa-user-tie"></i> Interviews</a>
+                    {% endif %}
+                    
+                    <!-- Faculty specific links -->
+                    {% if user.role == 'employee' and user.sub_role == 'faculty' %}
+                    <a href="{% url 'faculty:panel' %}"><i class="fas fa-chalkboard-teacher"></i> Faculty Panel</a>
+                    {% endif %}
+                    
+                    <!-- Teacher specific links -->
+                    {% if user.role == 'employee' and user.sub_role == 'teacher' %}
+                    <a href="{% url 'teacher:courses' %}"><i class="fas fa-book"></i> My Courses</a>
+                    {% endif %}
+                    
+                    <!-- Student specific links -->
+                    {% if user.role == 'student' %}
+                    <a href="{% url 'student:certificates' %}"><i class="fas fa-certificate"></i> Certificates</a>
+                    {% endif %}
+                    
+                    <div class="divider"></div>
+                    <a href="#" id="darkModeToggle"><i class="fas fa-moon"></i> Dark Mode</a>
+                    <a href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'dashboard' %}" class="{% if active_page == 'dashboard' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a></li>
+            
+            <!-- Admin Navigation -->
+            {% if user.role == 'admin' %}
+            <li><a href="{% url 'admin:user_management' %}" class="{% if active_page == 'user_management' %}active{% endif %}">
+                <i class="fas fa-users"></i> User Management
+            </a></li>
+            <li><a href="{% url 'admin:courses' %}" class="{% if active_page == 'courses' %}active{% endif %}">
+                <i class="fas fa-book"></i> Courses
+            </a></li>
+            <li><a href="{% url 'admin:attendance' %}" class="{% if active_page == 'attendance' %}active{% endif %}">
+                <i class="fas fa-calendar-check"></i> Attendance
+            </a></li>
+            <li><a href="{% url 'admin:events_notices' %}" class="{% if active_page == 'events_notices' %}active{% endif %}">
+                <i class="fas fa-calendar-alt"></i> Events & Notices
+            </a></li>
+            <li><a href="{% url 'admin:reports' %}" class="{% if active_page == 'reports' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a></li>
+            {% endif %}
+            
+            <!-- HR Navigation -->
+            {% if user.role == 'employee' and user.sub_role == 'hr' %}
+            <li><a href="{% url 'hr:employees' %}" class="{% if active_page == 'employees' %}active{% endif %}">
+                <i class="fas fa-users"></i> Employees
+            </a></li>
+            <li><a href="{% url 'hr:job_posts' %}" class="{% if active_page == 'job_posts' %}active{% endif %}">
+                <i class="fas fa-briefcase"></i> Job Posts
+            </a></li>
+            <li><a href="{% url 'hr:applications' %}" class="{% if active_page == 'applications' %}active{% endif %}">
+                <i class="fas fa-file-alt"></i> Applications
+            </a></li>
+            <li><a href="{% url 'hr:interviews' %}" class="{% if active_page == 'interviews' %}active{% endif %}">
+                <i class="fas fa-user-tie"></i> Interviews
+            </a></li>
+            <li><a href="{% url 'hr:reports' %}" class="{% if active_page == 'hr_reports' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a></li>
+            {% endif %}
+            
+            <!-- Faculty Navigation -->
+            {% if user.role == 'employee' and user.sub_role == 'faculty' %}
+            <li><a href="{% url 'faculty:teachers' %}" class="{% if active_page == 'teachers' %}active{% endif %}">
+                <i class="fas fa-chalkboard-teacher"></i> Teachers
+            </a></li>
+            <li><a href="{% url 'faculty:courses' %}" class="{% if active_page == 'faculty_courses' %}active{% endif %}">
+                <i class="fas fa-book"></i> Courses
+            </a></li>
+            <li><a href="{% url 'faculty:students' %}" class="{% if active_page == 'students' %}active{% endif %}">
+                <i class="fas fa-user-graduate"></i> Students
+            </a></li>
+            <li><a href="{% url 'faculty:requests' %}" class="{% if active_page == 'requests' %}active{% endif %}">
+                <i class="fas fa-clipboard-list"></i> Requests
+            </a></li>
+            <li><a href="{% url 'faculty:reports' %}" class="{% if active_page == 'faculty_reports' %}active{% endif %}">
+                <i class="fas fa-chart-bar"></i> Reports
+            </a></li>
+            {% endif %}
+            
+            <!-- Teacher Navigation -->
+            {% if user.role == 'employee' and user.sub_role == 'teacher' %}
+            <li><a href="{% url 'teacher:class_routine' %}" class="{% if active_page == 'class_routine' %}active{% endif %}">
+                <i class="fas fa-calendar-day"></i> Class Routine
+            </a></li>
+            <li><a href="{% url 'teacher:attendance' %}" class="{% if active_page == 'teacher_attendance' %}active{% endif %}">
+                <i class="fas fa-user-check"></i> Attendance
+            </a></li>
+            <li><a href="{% url 'teacher:lesson_plan' %}" class="{% if active_page == 'lesson_plan' %}active{% endif %}">
+                <i class="fas fa-book-open"></i> Lesson Plan
+            </a></li>
+            <li><a href="{% url 'teacher:courses' %}" class="{% if active_page == 'teacher_courses' %}active{% endif %}">
+                <i class="fas fa-book"></i> Courses
+            </a></li>
+            <li><a href="{% url 'teacher:assignments' %}" class="{% if active_page == 'assignments' %}active{% endif %}">
+                <i class="fas fa-tasks"></i> Assignments
+            </a></li>
+            {% endif %}
+            
+            <!-- Student Navigation -->
+            {% if user.role == 'student' %}
+            <li><a href="{% url 'student:academics' %}" class="{% if active_page == 'academics' %}active{% endif %}">
+                <i class="fas fa-graduation-cap"></i> Academics
+            </a></li>
+            <li><a href="{% url 'student:resources' %}" class="{% if active_page == 'resources' %}active{% endif %}">
+                <i class="fas fa-folder-open"></i> Resources
+            </a></li>
+            <li><a href="{% url 'student:certificates' %}" class="{% if active_page == 'student_certificates' %}active{% endif %}">
+                <i class="fas fa-certificate"></i> Certificates
+            </a></li>
+            <li><a href="{% url 'student:courses' %}" class="{% if active_page == 'student_courses' %}active{% endif %}">
+                <i class="fas fa-book"></i> Courses
+            </a></li>
+            {% endif %}
+            
+            <!-- Candidate Navigation -->
+            {% if user.role == 'candidate' %}
+            <li><a href="{% url 'candidate:available_jobs' %}" class="{% if active_page == 'available_jobs' %}active{% endif %}">
+                <i class="fas fa-briefcase"></i> Available Jobs
+            </a></li>
+            {% endif %}
+        </ul>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; <span id="currentYear"></span> InstaCore. All rights reserved. | Dev by <a href="https://github.com/ThinkOri" target="_blank">ThinkOri</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+    
+    <script>
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        
+        // Sidebar toggle
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+        
+        // Handle sidebar navigation
+        const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+        
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                // Remove active class from all links
+                sidebarLinks.forEach(l => l.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Close sidebar on mobile after clicking a link
+                if (window.innerWidth <= 992) {
+                    sidebar.classList.remove('active');
+                }
+            });
+        });
+        
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+        
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            body.classList.add('dark-mode');
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+        }
+        
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+            
+            // Update icon based on mode
+            if (body.classList.contains('dark-mode')) {
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    </script>
+</body>
+</html>

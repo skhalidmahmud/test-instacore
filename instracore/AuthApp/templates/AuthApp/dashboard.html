@@ -1,0 +1,401 @@
+{% extends 'AuthApp/master.html' %}
+
+{% block title %}Dashboard - InstaCore{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h1 class="h2">Dashboard</h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1">
+                <i class="fas fa-calendar"></i>
+                This week
+            </button>
+        </div>
+    </div>
+
+    <div class="dashboard-cards">
+        <!-- Admin Dashboard Cards -->
+        {% if user.role == 'admin' %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Students</h5>
+                <div class="card-icon primary">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_students|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 12% from last month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Teachers</h5>
+                <div class="card-icon success">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_teachers|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 5% from last month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Courses</h5>
+                <div class="card-icon warning">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_courses|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 8% from last month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Staff</h5>
+                <div class="card-icon danger">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_staff|default:0 }}</div>
+            <div class="card-change negative">
+                <i class="fas fa-arrow-down"></i> 2% from last month
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- HR Dashboard Cards -->
+        {% if user.role == 'employee' and user.sub_role == 'hr' %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Active Job Posts</h5>
+                <div class="card-icon primary">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ active_job_posts|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 3 new this week
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Pending Applications</h5>
+                <div class="card-icon warning">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ pending_applications|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 5 new today
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Scheduled Interviews</h5>
+                <div class="card-icon success">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ scheduled_interviews|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 2 this week
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Employees</h5>
+                <div class="card-icon danger">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_employees|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 1 new this month
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Faculty Dashboard Cards -->
+        {% if user.role == 'employee' and user.sub_role == 'faculty' %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Teachers</h5>
+                <div class="card-icon primary">
+                    <i class="fas fa-chalkboard-teacher"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_teachers|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 2 new this month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Students</h5>
+                <div class="card-icon success">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_students|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 15 new this month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Active Courses</h5>
+                <div class="card-icon warning">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ active_courses|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 3 new this month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Pending Requests</h5>
+                <div class="card-icon danger">
+                    <i class="fas fa-clipboard-list"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ pending_requests|default:0 }}</div>
+            <div class="card-change negative">
+                <i class="fas fa-arrow-up"></i> 2 pending
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Teacher Dashboard Cards -->
+        {% if user.role == 'employee' and user.sub_role == 'teacher' %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Active Courses</h5>
+                <div class="card-icon primary">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ active_courses|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 1 new this month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Total Students</h5>
+                <div class="card-icon success">
+                    <i class="fas fa-user-graduate"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ total_students|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 5 new this month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Pending Tasks</h5>
+                <div class="card-icon warning">
+                    <i class="fas fa-tasks"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ pending_tasks|default:0 }}</div>
+            <div class="card-change negative">
+                <i class="fas fa-arrow-up"></i> 3 pending
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Classes This Week</h5>
+                <div class="card-icon danger">
+                    <i class="fas fa-calendar-day"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ classes_this_week|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> Regular schedule
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Student Dashboard Cards -->
+        {% if user.role == 'student' %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Active Courses</h5>
+                <div class="card-icon primary">
+                    <i class="fas fa-book"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ active_courses|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 1 new this month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Attendance Rate</h5>
+                <div class="card-icon success">
+                    <i class="fas fa-user-check"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ attendance_rate|default:0 }}%</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 2% from last month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Certificates</h5>
+                <div class="card-icon warning">
+                    <i class="fas fa-certificate"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ certificates|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 1 new this month
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Unpaid Fees</h5>
+                <div class="card-icon danger">
+                    <i class="fas fa-money-bill-wave"></i>
+                </div>
+            </div>
+            <div class="card-value">${{ unpaid_fees|default:0 }}</div>
+            <div class="card-change negative">
+                <i class="fas fa-arrow-up"></i> Due this month
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Candidate Dashboard Cards -->
+        {% if user.role == 'candidate' %}
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Available Jobs</h5>
+                <div class="card-icon primary">
+                    <i class="fas fa-briefcase"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ available_jobs|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 3 new this week
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Applied Jobs</h5>
+                <div class="card-icon success">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ applied_jobs|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 2 new this week
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Interview Scheduled</h5>
+                <div class="card-icon warning">
+                    <i class="fas fa-user-tie"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ interviews_scheduled|default:0 }}</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> 1 this week
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Profile Completion</h5>
+                <div class="card-icon danger">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </div>
+            <div class="card-value">{{ profile_completion|default:0 }}%</div>
+            <div class="card-change positive">
+                <i class="fas fa-arrow-up"></i> Update profile
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row mt-4">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Recent Activities</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for activity in recent_activities %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">{{ activity.action }}</div>
+                                <small>{{ activity.timestamp|timesince }} ago</small>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No recent activities</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upcoming Events -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Upcoming Events</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        {% for event in events %}
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div class="ms-2 me-auto">
+                                <div class="fw-bold">{{ event.title }}</div>
+                                <small>{{ event.date }} | {{ event.start_time|default:"All day" }}</small>
+                            </div>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No upcoming events</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
