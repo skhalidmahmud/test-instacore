@@ -261,7 +261,7 @@
     <div class="register-container">
         <div class="register-card">
             <div class="register-header">
-                <a href="{% url 'index' %}" class="back-to-home">
+                <a href="{% url 'auth:index' %}" class="back-to-home">
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 <h1>Create Account</h1>
@@ -369,7 +369,7 @@
                 
                 <div class="register-footer">
                     <p>Already have an account? <a href="{% url 'auth:login' %}">Login</a></p>
-                    <p><a href="{% url 'index' %}">Back to Home</a></p>
+                    <p><a href="{% url 'auth:index' %}">Back to Home</a></p>
                 </div>
             </div>
         </div>

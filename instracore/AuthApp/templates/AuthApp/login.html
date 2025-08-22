@@ -201,7 +201,7 @@
     <div class="login-container">
         <div class="login-card">
             <div class="login-header">
-                <a href="{% url 'index' %}" class="back-to-home">
+                <a href="{% url 'auth:index' %}" class="back-to-home">
                     <i class="fas fa-arrow-left"></i>
                 </a>
                 <h1>Welcome Back</h1>
@@ -261,7 +261,7 @@
                 
                 <div class="login-footer">
                     <p>Don't have an account? <a href="{% url 'auth:register' %}">Register as Student</a></p>
-                    <p><a href="{% url 'index' %}">Back to Home</a></p>
+                    <p><a href="{% url 'auth:index' %}">Back to Home</a></p>
                 </div>
             </div>
         </div>

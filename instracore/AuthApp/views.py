@@ -42,7 +42,7 @@ def index(request):
             return redirect('candidate:dashboard')
     
     # Show public index page
-    return render(request, 'AuthApp/index.html')
+    return render(request, 'index.html')
 
 
 def login_view(request):
