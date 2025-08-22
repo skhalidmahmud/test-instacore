@@ -84,6 +84,8 @@ def register(request):
     return render(request, 'AuthApp/register.html', {'form': form})
 
 def login_view(request):
+    if not User.objects.filter(role='admin').exists():
+        return redirect('auth:setup')
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
