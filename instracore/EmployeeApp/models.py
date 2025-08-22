@@ -1,8 +1,9 @@
 from django.db import models
+from django.utils import timezone
 from AuthApp.models import User
 
 
-# HR Models
+# HR MODELS
 class JobPost(models.Model):
     ROLE_CHOICES = [
         ('admin', 'Admin'),
@@ -24,10 +25,13 @@ class JobPost(models.Model):
     language = models.CharField(max_length=50, default='English')
     availability = models.CharField(max_length=100)
     application_instructions = models.TextField()
-    posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="job_posts")
+    posted_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posted_job_posts")
     created_at = models.DateTimeField(auto_now_add=True)
     deadline = models.DateField()
     is_active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return self.title
 
 
 class Application(models.Model):
@@ -40,24 +44,31 @@ class Application(models.Model):
         ('hired', 'Hired'),
     ]
     
-    job = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="applications")
-    candidate = models.ForeignKey(User, on_delete=models.CASCADE, related_name="applications")
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    job = models.ForeignKey(JobPost, on_delete=models.CASCADE, related_name="employee_applications")
+    applicant_name = models.CharField(max_length=200)
+    applicant_email = models.EmailField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")  # pending/accepted/rejected
     applied_at = models.DateTimeField(auto_now_add=True)
     resume = models.FileField(upload_to='resumes/', blank=True, null=True)
     cover_letter = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f"{self.applicant_name} - {self.job.title}"
 
 
 class InterviewSchedule(models.Model):
-    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="interviews")
+    application = models.ForeignKey(Application, on_delete=models.CASCADE, related_name="employee_interviews")
     scheduled_date = models.DateTimeField()
-    interviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="interviews_conducted")
+    interviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="employee_interviews_conducted")
     notes = models.TextField(blank=True)
     status = models.CharField(max_length=20, choices=[('scheduled', 'Scheduled'), ('completed', 'Completed'), ('cancelled', 'Cancelled')])
     feedback = models.TextField(blank=True)
+    
+    def __str__(self):
+        return f"Interview for {self.application.applicant_name} - {self.application.job.title}"
 
 
-# Finance Models
+# FINANCE MODELS
 class Salary(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -66,7 +77,7 @@ class Salary(models.Model):
         ('rejected', 'Rejected'),
     ]
     
-    employee = models.ForeignKey(User, on_delete=models.CASCADE, related_name="salaries")
+    employee = models.ForeignKey(User, on_delete=models.CASCADE, related_name="employee_salaries")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     month = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
@@ -76,6 +87,9 @@ class Salary(models.Model):
     
     class Meta:
         unique_together = ('employee', 'month')
+    
+    def __str__(self):
+        return f"{self.employee.username} - {self.month.strftime('%B %Y')}"
 
 
 class Expense(models.Model):
@@ -96,6 +110,9 @@ class Expense(models.Model):
     approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="expenses_approved")
     created_at = models.DateTimeField(auto_now_add=True)
     status = models.CharField(max_length=20, choices=[('pending', 'Pending'), ('approved', 'Approved'), ('rejected', 'Rejected')])
+    
+    def __str__(self):
+        return f"{self.category} - {self.amount}"
 
 
 class Transaction(models.Model):
@@ -108,15 +125,18 @@ class Transaction(models.Model):
         ('other', 'Other'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="employee_transactions")
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    transaction_type = models.CharField(max_length=50, choices=TYPE_CHOICES)
+    transaction_type = models.CharField(max_length=50, choices=TYPE_CHOICES)  # fee, purchase, refund, etc.
     description = models.TextField(blank=True)
     date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.transaction_type} - {self.amount}"
 
 
-# Faculty/Teacher Models
+# FACULTY / TEACHER MODELS
 class Course(models.Model):
     TYPE_CHOICES = [
         ('online', 'Online'),
@@ -155,6 +175,9 @@ class CourseTeacher(models.Model):
     
     class Meta:
         unique_together = ('course', 'teacher')
+    
+    def __str__(self):
+        return f"{self.teacher.username} - {self.course.title}"
 
 
 class Assignment(models.Model):
@@ -166,6 +189,9 @@ class Assignment(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="assignments_created")
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
+    
+    def __str__(self):
+        return f"{self.title} - {self.course.title}"
 
 
 class LessonPlan(models.Model):
@@ -175,6 +201,9 @@ class LessonPlan(models.Model):
     date = models.DateField()
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name="lesson_plans_created")
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.title} - {self.course.title}"
 
 
 class Attendance(models.Model):
@@ -185,7 +214,7 @@ class Attendance(models.Model):
         ('late', 'Late'),
     ]
     
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="attendance_records")
     date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="present")
     check_in_time = models.TimeField(blank=True, null=True)
@@ -195,6 +224,9 @@ class Attendance(models.Model):
     
     class Meta:
         unique_together = ('user', 'date')
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.date} - {self.status}"
 
 
 class ClassRoutine(models.Model):
@@ -218,3 +250,6 @@ class ClassRoutine(models.Model):
     
     class Meta:
         unique_together = ('teacher', 'course', 'day_of_week', 'start_time')
+    
+    def __str__(self):
+        return f"{self.course.title} - {self.day_of_week} - {self.start_time}"

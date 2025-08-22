@@ -72,9 +72,9 @@
                     
                     <!-- Admin specific links -->
                     {% if user.role == 'admin' %}
-                    <a href="{% url 'admin:create_admin' %}"><i class="fas fa-user-plus"></i> Create Admin</a>
-                    <a href="{% url 'admin:create_user' %}"><i class="fas fa-users"></i> Create User</a>
-                    <a href="{% url 'admin:panel' %}"><i class="fas fa-tachometer-alt"></i> Admin Panel</a>
+                    <a href="{% url 'admin_dashboard:create_user' %}"><i class="fas fa-user-plus"></i> Create Admin</a>
+                    <a href="{% url 'admin_dashboard:create_user' %}"><i class="fas fa-users"></i> Create User</a>
+                    <a href="{% url 'admin_dashboard:dashboard' %}"><i class="fas fa-tachometer-alt"></i> Admin Panel</a>
                     {% endif %}
                     
                     <!-- HR specific links -->
