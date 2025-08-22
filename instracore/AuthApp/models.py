@@ -67,7 +67,7 @@ class AuditLog(models.Model):
 class Trash(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     model_name = models.CharField(max_length=100)
-    object_data = models.JSONField()
+    object_data = models.JSONField()   # Store deleted object as JSON
     deleted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     deleted_at = models.DateTimeField(auto_now_add=True)
 

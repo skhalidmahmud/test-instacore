@@ -1,0 +1,239 @@
+{% extends 'AuthApp/master.html' %}
+
+{% block title %}HR Dashboard - InstaCore{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">HR Dashboard</h1>
+    
+    <!-- Summary Cards -->
+    <div class="row">
+        <!-- Employees Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Employees</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_employees }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Job Posts Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Active Job Posts</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_job_posts }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-briefcase fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Applications Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Pending Applications</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_applications }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interviews Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Scheduled Interviews</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ scheduled_interviews }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Job Posts and Applications -->
+    <div class="row">
+        <!-- Recent Job Posts -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Job Posts</h6>
+                    <a href="{% url 'employee:job_posts' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_job_posts %}
+                        <div class="list-group">
+                            {% for job in recent_job_posts %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ job.title }}</h6>
+                                        <small>{{ job.created_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ job.description|truncatewords:10 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Role: {{ job.role|title }}</small>
+                                        <div>
+                                            {% if job.is_active %}
+                                                <span class="badge badge-success">Active</span>
+                                            {% else %}
+                                                <span class="badge badge-danger">Inactive</span>
+                                            {% endif %}
+                                            <a href="{% url 'employee:update_job_post' job.pk %}" class="btn btn-sm btn-info ml-1">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500">No recent job posts</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Applications -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Applications</h6>
+                    <a href="{% url 'employee:applications' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_applications %}
+                        <div class="list-group">
+                            {% for application in recent_applications %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ application.applicant_name }}</h6>
+                                        <small>{{ application.applied_at|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">Applied for: {{ application.job.title }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge badge-{{ application.status }}">{{ application.status|title }}</span>
+                                        <a href="{% url 'employee:application_detail' application.pk %}" class="btn btn-sm btn-primary">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500">No recent applications</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upcoming Interviews -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Upcoming Interviews</h6>
+                    <a href="{% url 'employee:interviews' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_interviews %}
+                        <div class="table-responsive">
+                            <table class="table table-bordered" width="100%" cellspacing="0">
+                                <thead>
+                                    <tr>
+                                        <th>Candidate</th>
+                                        <th>Job Position</th>
+                                        <th>Scheduled Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for interview in upcoming_interviews %}
+                                        <tr>
+                                            <td>{{ interview.application.applicant_name }}</td>
+                                            <td>{{ interview.application.job.title }}</td>
+                                            <td>{{ interview.scheduled_date|date:"M d, Y g:i A" }}</td>
+                                            <td>
+                                                <span class="badge badge-{{ interview.status }}">{{ interview.status|title }}</span>
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'employee:interview_detail' interview.pk %}" class="btn btn-sm btn-primary">
+                                                    View Details
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500 py-3">No upcoming interviews</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'employee:create_job_post' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-plus mr-2"></i> Create Job Post
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'employee:applications' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-file-alt mr-2"></i> Review Applications
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'employee:interviews' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-user-tie mr-2"></i> Manage Interviews
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'employee:hr_reports' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-chart-bar mr-2"></i> Generate Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

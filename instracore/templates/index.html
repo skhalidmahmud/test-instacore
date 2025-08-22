@@ -629,8 +629,12 @@
                     <li><a href="#home" class="nav-link">Home</a></li>
                     <li><a href="#about" class="nav-link">About</a></li>
                     <li><a href="#courses" class="nav-link">Courses</a></li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'auth:logout' %}" class="btn">Logout</a></li>
+                    {% else %}
                     <li><a href="{% url 'auth:login' %}" class="btn">Login</a></li>
                     <li><a href="{% url 'auth:register' %}" class="btn">Sign up as student</a></li>
+                    {% endif %}
                     <li><a href="#career" class="nav-link">Career</a></li>
                     <li><a href="#contact" class="nav-link">Contact</a></li>
                 </ul>

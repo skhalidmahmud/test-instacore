@@ -19,8 +19,8 @@ def index(request):
         return redirect('setup')
     
     # If user is authenticated, redirect to dashboard
-    if request.user.is_authenticated:
-        return redirect('dashboard')
+    # if request.user.is_authenticated:
+    #     return redirect('dashboard')
     
     return render(request, 'index.html')
 

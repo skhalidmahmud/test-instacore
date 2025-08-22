@@ -1,0 +1,245 @@
+{% extends 'AuthApp/master.html' %}
+
+{% block title %}Candidate Dashboard - InstaCore{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Candidate Dashboard</h1>
+    
+    <!-- Profile Completion Alert -->
+    {% if not profile %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <strong>Complete Your Profile!</strong> Please complete your profile to apply for jobs.
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endif %}
+    
+    <!-- Summary Cards -->
+    <div class="row">
+        <!-- Total Applications Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Applications</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_applications }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-file-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Pending Applications Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Pending</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_applications }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-hourglass-half fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Interviews Scheduled Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Interviews</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ interview_scheduled_applications }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-tie fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Rejected Applications Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-danger shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Rejected</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ rejected_applications }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-times-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Available Jobs and Upcoming Interviews -->
+    <div class="row">
+        <!-- Available Jobs -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Available Jobs</h6>
+                    <a href="{% url 'candidate:available_jobs' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if available_jobs %}
+                        <div class="list-group">
+                            {% for job in available_jobs %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ job.title }}</h6>
+                                        <small>{{ job.deadline|date:"M d, Y" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ job.description|truncatewords:10 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Role: {{ job.role|title }}</small>
+                                        <a href="{% url 'candidate:job_detail' job.pk %}" class="btn btn-sm btn-primary">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500">No available jobs at the moment</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upcoming Interviews -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Upcoming Interviews</h6>
+                    <a href="{% url 'candidate:interviews' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_interviews %}
+                        <div class="list-group">
+                            {% for interview in upcoming_interviews %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ interview.application.job.title }}</h6>
+                                        <small>{{ interview.scheduled_date|date:"M d, g:i A" }}</small>
+                                    </div>
+                                    <p class="mb-1">{{ interview.notes|truncatewords:10 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge badge-{{ interview.status }}">{{ interview.status|title }}</span>
+                                        <a href="{% url 'candidate:interview_detail' interview.pk %}" class="btn btn-sm btn-primary">
+                                            View Details
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500">No upcoming interviews</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Application Statistics -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Application Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center">
+                                <div class="h3 text-primary">{{ total_applications }}</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center">
+                                <div class="h3 text-info">{{ pending_applications }}</div>
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Pending</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center">
+                                <div class="h3 text-warning">{{ under_review_applications }}</div>
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Under Review</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center">
+                                <div class="h3 text-success">{{ interview_scheduled_applications }}</div>
+                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Interview</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center">
+                                <div class="h3 text-info">0</div>
+                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Accepted</div>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <div class="text-center">
+                                <div class="h3 text-danger">{{ rejected_applications }}</div>
+                                <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Rejected</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'candidate:profile' %}" class="btn btn-primary btn-block">
+                                <i class="fas fa-user mr-2"></i> Update Profile
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'candidate:available_jobs' %}" class="btn btn-info btn-block">
+                                <i class="fas fa-briefcase mr-2"></i> Browse Jobs
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'candidate:my_applications' %}" class="btn btn-warning btn-block">
+                                <i class="fas fa-file-alt mr-2"></i> My Applications
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'candidate:interviews' %}" class="btn btn-success btn-block">
+                                <i class="fas fa-user-tie mr-2"></i> Interviews
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

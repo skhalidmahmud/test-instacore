@@ -1,0 +1,311 @@
+{% extends 'AuthApp/master.html' %}
+
+{% block title %}Admin Dashboard - InstaCore{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Admin Dashboard</h1>
+    
+    <!-- Summary Cards -->
+    <div class="row">
+        <!-- Students Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Students</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_students }}</div>
+                            <div class="text-xs text-gray-600">
+                                <span class="text-success">{{ active_students }} Active</span> / 
+                                <span class="text-danger">{{ inactive_students }} Inactive</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-user-graduate fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Teachers Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Teachers</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_teachers }}</div>
+                            <div class="text-xs text-gray-600">
+                                <span class="text-success">{{ active_teachers }} Active</span> / 
+                                <span class="text-danger">{{ inactive_teachers }} Inactive</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-chalkboard-teacher fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Staff Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Staff</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_staff }}</div>
+                            <div class="text-xs text-gray-600">
+                                <span class="text-success">{{ active_staff }} Active</span> / 
+                                <span class="text-danger">{{ inactive_staff }} Inactive</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Courses Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_courses }}</div>
+                            <div class="text-xs text-gray-600">
+                                <span class="text-success">{{ active_courses }} Active</span> / 
+                                <span class="text-danger">{{ inactive_courses }} Inactive</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Financial Overview -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Financial Overview</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-success text-white shadow">
+                                <div class="card-body">
+                                    Income
+                                    <div class="h5 mb-0">${{ income|floatformat:2 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-danger text-white shadow">
+                                <div class="card-body">
+                                    Expenses
+                                    <div class="h5 mb-0">${{ expenses|floatformat:2 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-info text-white shadow">
+                                <div class="card-body">
+                                    Fees Collected
+                                    <div class="h5 mb-0">${{ fees_collected|floatformat:2 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <div class="card bg-warning text-white shadow">
+                                <div class="card-body">
+                                    Salaries Paid
+                                    <div class="h5 mb-0">${{ salaries_paid|floatformat:2 }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="{% url 'admin:create_user' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-user-plus mr-2"></i> Create User
+                        </a>
+                        <a href="{% url 'admin:create_event' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-calendar-plus mr-2"></i> Add Event
+                        </a>
+                        <a href="{% url 'admin:create_notice' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-bullhorn mr-2"></i> Add Notice
+                        </a>
+                        <a href="{% url 'admin:accounts' %}" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-line mr-2"></i> View Accounts
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activities and Notices -->
+    <div class="row">
+        <!-- Recent Activities -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Activities</h6>
+                </div>
+                <div class="card-body">
+                    {% if recent_activities %}
+                        <div class="timeline">
+                            {% for activity in recent_activities %}
+                                <div class="timeline-item">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <span class="timeline-time">{{ activity.created_at|timesince }} ago</span>
+                                        <p class="mb-0">{{ activity.action }}</p>
+                                        <small class="text-muted">by {{ activity.user.username }}</small>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500">No recent activities</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Upcoming Events and Notices -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Upcoming Events & Notices</h6>
+                </div>
+                <div class="card-body">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs" id="eventsNoticesTabs" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="events-tab" data-toggle="tab" href="#events" role="tab">Events</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="notices-tab" data-toggle="tab" href="#notices" role="tab">Notices</a>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="eventsNoticesTabContent">
+                        <!-- Events Tab -->
+                        <div class="tab-pane fade show active" id="events" role="tabpanel">
+                            {% if upcoming_events %}
+                                <div class="list-group list-group-flush">
+                                    {% for event in upcoming_events %}
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1">{{ event.title }}</h6>
+                                                <small>{{ event.date|date:"M d, Y" }}</small>
+                                            </div>
+                                            <p class="mb-1">{{ event.description|truncatewords:10 }}</p>
+                                            <small class="text-muted">{{ event.category|title }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-center text-gray-500 mt-3">No upcoming events</p>
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Notices Tab -->
+                        <div class="tab-pane fade" id="notices" role="tabpanel">
+                            {% if recent_notices %}
+                                <div class="list-group list-group-flush">
+                                    {% for notice in recent_notices %}
+                                        <div class="list-group-item px-0">
+                                            <div class="d-flex w-100 justify-content-between">
+                                                <h6 class="mb-1">{{ notice.title }}</h6>
+                                                <span class="badge badge-{{ notice.priority }} badge-pill">{{ notice.priority }}</span>
+                                            </div>
+                                            <p class="mb-1">{{ notice.content|truncatewords:10 }}</p>
+                                            <small class="text-muted">{{ notice.created_at|date:"M d, Y" }}</small>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p class="text-center text-gray-500 mt-3">No recent notices</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Attendance Overview -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Today's Attendance Overview</h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="attendanceDropdown" data-toggle="dropdown">
+                            Filter
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="attendanceDropdown">
+                            <a class="dropdown-item" href="{% url 'admin:attendance' %}?attendee_type=student">Students</a>
+                            <a class="dropdown-item" href="{% url 'admin:attendance' %}?attendee_type=teacher">Teachers</a>
+                            <a class="dropdown-item" href="{% url 'admin:attendance' %}?attendee_type=staff">Staff</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="{% url 'admin:attendance' %}">View All</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Students</div>
+                                    <div class="h3 mb-0 font-weight-bold text-gray-800">{{ student_attendance }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Teachers</div>
+                                    <div class="h3 mb-0 font-weight-bold text-gray-800">{{ teacher_attendance }}</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Staff</div>
+                                    <div class="h3 mb-0 font-weight-bold text-gray-800">{{ staff_attendance }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,71 +1,120 @@
-// This file can be used for additional JavaScript functionality
-// Most of the JavaScript is already included in the master.html template
-
-// Example of additional functions that might be needed:
-
-// Function to format dates
-function formatDate(date) {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(date).toLocaleDateString(undefined, options);
-}
-
-// Function to show notifications
-function showNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
-    notification.style.top = '20px';
-    notification.style.right = '20px';
-    notification.style.zIndex = '9999';
-    notification.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    `;
+// Sidebar toggle
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.querySelector('.main-content');
+    const header = document.querySelector('.header');
     
-    // Add to body
-    document.body.appendChild(notification);
+    if (sidebarToggle) {
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('active');
+            header.classList.toggle('active');
+        });
+    }
     
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        notification.remove();
-    }, 5000);
-}
-
-// Function to confirm actions
-function confirmAction(message) {
-    return confirm(message);
-}
-
-// Function to handle AJAX requests
-function ajaxRequest(url, method = 'GET', data = null) {
-    return fetch(url, {
-        method: method,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: data ? JSON.stringify(data) : null
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    });
-}
-
-// Function to get CSRF token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
+    // Set current year in footer
+    const currentYearElement = document.getElementById('currentYear');
+    if (currentYearElement) {
+        currentYearElement.textContent = new Date().getFullYear();
+    }
+    
+    // Dark mode toggle
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    
+    // Check for saved dark mode preference
+    if (localStorage.getItem('darkMode') === 'enabled') {
+        body.classList.add('dark-mode');
+        if (darkModeToggle) {
+            darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
         }
     }
-    return cookieValue;
+    
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', function() {
+            body.classList.toggle('dark-mode');
+            
+            // Update icon based on mode
+            if (body.classList.contains('dark-mode')) {
+                darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+                localStorage.setItem('darkMode', 'enabled');
+            } else {
+                darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+                localStorage.setItem('darkMode', 'disabled');
+            }
+        });
+    }
+    
+    // Handle sidebar navigation
+    const sidebarLinks = document.querySelectorAll('.sidebar-menu a');
+    
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Remove active class from all links
+            sidebarLinks.forEach(l => l.classList.remove('active'));
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Close sidebar on mobile after clicking a link
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('active');
+                mainContent.classList.remove('active');
+                header.classList.remove('active');
+            }
+        });
+    });
+    
+    // Initialize tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="tooltip"]'));
+    tooltipTriggerList.map(function(tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+    
+    // Initialize popovers
+    const popoverTriggerList = [].slice.call(document.querySelectorAll('[data-toggle="popover"]'));
+    popoverTriggerList.map(function(popoverTriggerEl) {
+        return new bootstrap.Popover(popoverTriggerEl);
+    });
+    
+    // Auto-hide alerts after 5 seconds
+    setTimeout(function() {
+        const alerts = document.querySelectorAll('.alert');
+        alerts.forEach(function(alert) {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        });
+    }, 5000);
+});
+
+// Function to confirm delete actions
+function confirmDelete(message) {
+    return confirm(message || 'Are you sure you want to delete this item?');
+}
+
+// Function to format currency
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(amount);
+}
+
+// Function to format date
+function formatDate(dateString) {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+}
+
+// Function to format datetime
+function formatDateTime(dateString) {
+    const options = { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString(undefined, options);
 }

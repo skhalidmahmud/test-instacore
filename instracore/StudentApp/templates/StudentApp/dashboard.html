@@ -1,0 +1,220 @@
+{% extends 'AuthApp/master.html' %}
+
+{% block title %}Student Dashboard - InstaCore{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">Student Dashboard</h1>
+    
+    <!-- Summary Cards -->
+    <div class="row">
+        <!-- Active Courses Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Active Courses</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ active_courses }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-book fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Certificates Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Certificates</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ earned_certificates }}</div>
+                            <div class="text-xs text-gray-600">
+                                <span class="text-warning">{{ pending_certificates }} Pending</span>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-certificate fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Unpaid Fees Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Unpaid Fees</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">${{ unpaid_fees|floatformat:2 }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Attendance Rate Card -->
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Attendance Rate</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">85%</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Upcoming Classes and Recent Results -->
+    <div class="row">
+        <!-- Upcoming Classes -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Upcoming Classes</h6>
+                    <a href="{% url 'student:academics' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if upcoming_classes %}
+                        <div class="list-group">
+                            {% for class_item in upcoming_classes %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ class_item.course.title }}</h6>
+                                        <small>{{ class_item.date|date:"D, M d" }} {{ class_item.start_time|date:"g:i A" }}</small>
+                                    </div>
+                                    <p class="mb-1">Teacher: {{ class_item.teacher.get_full_name|default:class_item.teacher.username }}</p>
+                                    <small class="text-muted">Room: {{ class_item.room|default:"TBA" }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500">No upcoming classes this week</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Results -->
+        <div class="col-lg-6">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Recent Results</h6>
+                    <a href="{% url 'student:exam_results' %}" class="btn btn-primary btn-sm">View All</a>
+                </div>
+                <div class="card-body">
+                    {% if recent_results %}
+                        <div class="list-group">
+                            {% for result in recent_results %}
+                                <div class="list-group-item">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">{{ result.exam_name }}</h6>
+                                        <div>
+                                            <span class="badge {% if result.passed %}badge-success{% else %}badge-danger{% endif %}">
+                                                {{ result.marks_obtained }}/{{ result.total_marks }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <p class="mb-1">Course: {{ result.enrollment.course.title }}</p>
+                                    <small class="text-muted">{{ result.created_at|date:"M d, Y" }}</small>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <p class="text-center text-gray-500">No recent results</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- My Courses -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">My Courses</h6>
+                    <a href="{% url 'student:courses' %}" class="btn btn-primary btn-sm">Browse More</a>
+                </div>
+                <div class="card-body">
+                    {% if my_courses %}
+                        <div class="row">
+                            {% for enrollment in my_courses %}
+                                <div class="col-md-4 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ enrollment.course.title }}</h5>
+                                            <p class="card-text">{{ enrollment.course.description|truncatewords:15 }}</p>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="badge badge-{{ enrollment.status }}">{{ enrollment.status|title }}</span>
+                                                <a href="{% url 'student:course_detail' enrollment.course.pk %}" class="btn btn-sm btn-primary">
+                                                    View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-gray-500 mb-3">You are not enrolled in any courses yet</p>
+                            <a href="{% url 'student:courses' %}" class="btn btn-primary">Browse Courses</a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Links -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Quick Links</h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'student:academics' %}" class="btn btn-outline-primary btn-block">
+                                <i class="fas fa-graduation-cap mr-2"></i> Academics
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'student:finance' %}" class="btn btn-outline-success btn-block">
+                                <i class="fas fa-money-bill-wave mr-2"></i> Finance
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'student:resources' %}" class="btn btn-outline-info btn-block">
+                                <i class="fas fa-folder-open mr-2"></i> Resources
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{% url 'student:certificates' %}" class="btn btn-outline-warning btn-block">
+                                <i class="fas fa-certificate mr-2"></i> Certificates
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
